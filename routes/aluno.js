@@ -3,44 +3,56 @@
 var express   = require('express');
 var router    = express.Router();
 const Easyac  = require('easyac-crawler');
+var Aluno = require('../models/aluno');
 
-const token = (req) => {
-    let auth = req.headers.authorization;
-    let reg = /Token="(.*)"/ig;
-    let matched = reg.exec(auth);
-    return matched[1];
-}
+const getToken = (req) => {
+  let auth = req.headers.authorization;
+  let reg = /Bearer (.*)/ig;
+  let matched = reg.exec(auth);
+  return matched[1];
+};
 
-router.get('/codigo', (req, res, next) => {
-    let cookie = token(req);
+router.get('/turmas', (req, res) => {
+  let token = getToken(req);
 
-    Easyac
-    .getCodigoAluno(cookie)
-    .then(function(codigo){
-        res.send({
-            codigo: codigo
-        });
+  Aluno.findOne({webToken: token}, (err, aluno) => {
+    if(err || !aluno.cookie) throw err;
+    let AlunoBot = Easyac.aluno(aluno.cookie);
+
+    AlunoBot.get()
+    .then(() => {
+      return AlunoBot.getTurmas();
     })
-    .catch(function(err){
-        res.status(400).send(err);
-    });
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => console.log(err));
+
+  });
 });
 
-router.get('/titulos', (req, res, next) => {
-    let cookie = token(req);
 
-    Easyac
-        .getTitulos(cookie)
-        .then(function(titulos){
-            res.send({
-                titulos: titulos
-            });
-        })
-        .catch(function(err){
-            res.status(400).send(err);
-        });
+router.get('/scrap/turmas', (req, res) => {
+  let token = getToken(req);
+
+  Aluno.findOne({webToken: token}, (err, aluno) => {
+    if(err || !aluno.cookie) throw err;
+    let AlunoBot = Easyac.aluno(aluno.cookie);
+
+    AlunoBot.get()
+    .then(() => {
+      return AlunoBot.getTurmas();
+    })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => console.log(err));
+
+  });
 });
+
 
 
 module.exports = router;
+
 
