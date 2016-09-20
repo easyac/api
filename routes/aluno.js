@@ -4,6 +4,8 @@ var express   = require('express');
 var router    = express.Router();
 const Easyac  = require('easyac-crawler');
 var Aluno = require('../models/aluno');
+var Nota = require('../models/nota');
+var Falta = require('../models/falta');
 
 const getToken = (req) => {
   let auth = req.headers.authorization;
@@ -14,16 +16,58 @@ const getToken = (req) => {
 
 router.get('/turmas', (req, res) => {
   let token = getToken(req);
+  res.send({
+    token: token,
+    msg: 'oi'
+  });
+});
 
-  Aluno.findOne({webToken: token}, (err, aluno) => {
-    if(err || !aluno.cookie) throw err;
-    let AlunoBot = Easyac.aluno(aluno.cookie);
+
+router.get('/scrap/notas', (req, res) => {
+  let token = getToken(req);
+  let query = {webToken: token};
+
+  Aluno.findOne(query, (err, alunoDB) => {
+    if(err || !alunoDB.cookie) throw err;
+
+    let AlunoBot = Easyac.aluno(alunoDB.cookie);
 
     AlunoBot.get()
     .then(() => {
       return AlunoBot.getTurmas();
     })
     .then((data) => {
+      Aluno.update(query, { code: data.codigo});
+
+      data.turmas.forEach((turma) => {
+        turma.disciplinas.forEach((disc) => {
+          let parciais = [];
+
+          if(disc.notas.parciais){
+            parciais = disc.notas.parciais.map((nota) => {
+              return {
+                'descricao': nota.descricao,
+                'ordemParcial': nota.ordemParcial,
+                'valorAvaliacaoParcial': nota.valorAvaliacaoParcial,
+              };
+            });
+          }
+
+          let nota = new Nota({
+            'alunoId': alunoDB._id,
+            'cursoId': turma.cursoId,
+            'ano': turma.ano,
+            'semestre': turma.semestre,
+            'disciplina': disc.descricaoDisciplina,
+            'conceito': disc.notas.conceito,
+            'parciais': parciais
+          });
+
+          nota.save();
+        });
+      });
+
+      Aluno.update(query, { lastSearch: new Date()});
       res.send(data);
     })
     .catch((err) => console.log(err));
@@ -31,19 +75,39 @@ router.get('/turmas', (req, res) => {
   });
 });
 
-
-router.get('/scrap/turmas', (req, res) => {
+router.get('/scrap/faltas', (req, res) => {
   let token = getToken(req);
+  let query = {webToken: token};
 
-  Aluno.findOne({webToken: token}, (err, aluno) => {
-    if(err || !aluno.cookie) throw err;
-    let AlunoBot = Easyac.aluno(aluno.cookie);
+  Aluno.findOne(query, (err, alunoDB) => {
+    if(err || !alunoDB.cookie) throw err;
+
+    let AlunoBot = Easyac.aluno(alunoDB.cookie);
 
     AlunoBot.get()
     .then(() => {
       return AlunoBot.getTurmas();
     })
     .then((data) => {
+      Aluno.update(query, { code: data.codigo});
+
+      data.turmas.forEach((turma) => {
+        turma.disciplinas.forEach((disc) => {
+
+          let falta = new Falta({
+            'alunoId': alunoDB._id,
+            'cursoId': turma.cursoId,
+            'ano': turma.ano,
+            'semestre': turma.semestre,
+            'disciplina': disc.descricaoDisciplina,
+            'faltas': disc.faltas.total
+          });
+
+          falta.save();
+        });
+      });
+
+      Aluno.update(query, { lastSearch: new Date()});
       res.send(data);
     })
     .catch((err) => console.log(err));

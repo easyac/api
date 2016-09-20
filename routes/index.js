@@ -31,11 +31,8 @@ router.post('/login', (req, res) => {
           aluno.save();
         }
 
-
-
         res.json(token);
       });
-
     })
     .catch(function(err){
       res.status(400).send(err);
