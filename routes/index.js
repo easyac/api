@@ -35,8 +35,10 @@ router.post('/login', (req, res) => {
           aluno.save(err => {
             if(err) throw err;
             let token = jwt.sign({ username: username, id: aluno._id }, Auth.jwtSecret);
-            Aluno.update(query, { webToken: token });
-            res.json(token);
+            Aluno.update(query, { webToken: token }, {multi: true}, (err, al) => {
+              console.log(err, al);
+              res.json(token);
+            });
           });
         }
 
