@@ -1,7 +1,8 @@
 'use strict';
 
-var mongoose = require('mongoose');
-var notaSchema = mongoose.Schema({
+const mongoose = require('mongoose');
+
+const schema = {
   'alunoId': String,
   'cursoId': Number,
   'disciplina': String,
@@ -15,8 +16,9 @@ var notaSchema = mongoose.Schema({
       'valorAvaliacaoParcial': String,
     }
   ]
-});
+};
 
+const notaSchema = mongoose.Schema(schema);
 notaSchema.index({ alunoId: 1 });
 
 module.exports = mongoose.model('Nota', notaSchema);

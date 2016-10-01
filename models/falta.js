@@ -1,14 +1,16 @@
 'use strict';
+const mongoose = require('mongoose');
 
-var mongoose = require('mongoose');
-var faltaSchema = mongoose.Schema({
+const schema = {
   'alunoId': String,
   'cursoId': Number,
   'disciplina': String,
   'ano': Number,
   'semestre': Number,
   'faltas': Number
-});
+};
+
+const faltaSchema = mongoose.Schema(schema);
 
 faltaSchema.index({ alunoId: 1, ano: 1, semester: 1 });
 

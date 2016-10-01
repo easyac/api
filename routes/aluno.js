@@ -14,13 +14,35 @@ const getToken = (req) => {
   return matched[1];
 };
 
-router.get('/turmas', (req, res) => {
+router.get('/faltas', (req, res) => {
   let token = getToken(req);
-  res.send({
-    token: token,
-    msg: 'oi'
+  let query = {webToken: token};
+
+  Aluno.findOne(query, (err, aluno) => {
+    if(!aluno){
+      res.status(402).send(err);
+      return;
+    }
+    let queryFalta = {alunoId: aluno._id};
+    let filterFields = {alunoId: 0, _id: 0, __v: 0};
+
+    Falta.find(queryFalta, filterFields, (err, faltas) => {
+      if(err) res.send(err);
+      res.send(faltas);
+    });
   });
+
+
 });
+
+// router.get('/faltas', (req, res) => {
+//   let token = getToken(req);
+//   let query = {webToken: token};
+
+//   Falta.find(query, (faltas) => {
+//     res.send(faltas);
+//   });
+// });
 
 
 router.get('/scrap/notas', (req, res) => {

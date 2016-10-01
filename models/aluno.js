@@ -1,24 +1,24 @@
-var mongoose = require('mongoose');
+'use strict';
+const mongoose = require('mongoose');
 
-var alunoSchema = mongoose.Schema({
+const schema = {
   'username': String,
-  'unity': Number,
+  'unity': Number, // campus
   'password': String,
   'cookie': String,
   'webToken': String,
   'deviceTokens': [
-  {
-    'type': String,
-    'value': String
-  }
+    {
+      'type': String,
+      'value': String
+    }
   ],
   'isValidCookie': Boolean,
   'createdAt': Date,
   'lastSearch': Date
-});
+};
 
-// alunoSchema.methods.validPassword = function(password) {
-//     return true;
-// };
+
+const alunoSchema = mongoose.Schema(schema);
 
 module.exports = mongoose.model('Aluno', alunoSchema);
