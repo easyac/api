@@ -12,7 +12,6 @@ const Auth = require('./config/auth');
 mongoose.connect(configDB.url);
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
 var aluno = require('./routes/aluno');
 var faltas = require('./routes/faltas');
 var notas = require('./routes/notas');
@@ -27,7 +26,6 @@ app.use(cookieParser());
 app.use(expressJWT({ secret: Auth.jwtSecret }).unless({ path: ['/login'] }));
 
 app.use('/', routes);
-app.use('/users', users);
 app.use('/aluno', aluno);
 app.use('/faltas', faltas);
 app.use('/notas', notas);

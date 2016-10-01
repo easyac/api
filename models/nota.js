@@ -19,6 +19,6 @@ const schema = {
 };
 
 const notaSchema = mongoose.Schema(schema);
-notaSchema.index({ alunoId: 1 });
+notaSchema.index({ alunoId: 1, ano: 1, semester: 1 });
 
 module.exports = mongoose.model('Nota', notaSchema);

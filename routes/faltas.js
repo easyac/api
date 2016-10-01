@@ -14,10 +14,16 @@ const getToken = (req) => {
 };
 
 router.get('/', (req, res) => {
-  let token = getToken(req);
-  let payload = jwt.verify(token, Auth.jwtSecret);
-  let queryFalta = { alunoId: payload.alunoId };
-  let filterFields = {alunoId: 0, _id: 0, __v: 0};
+  const token = getToken(req);
+  const payload = jwt.verify(token, Auth.jwtSecret);
+  const filterFields = {alunoId: 0, _id: 0, __v: 0};
+  let queryFalta = { alunoId: payload.id };
+
+  if(req.query.ano)
+    queryFalta.ano = req.query.ano;
+
+  if(req.query.semestre)
+    queryFalta.semestre = req.query.semestre;
 
   Falta.find(queryFalta, filterFields, (err, faltas) => {
     if(err) res.status(400).send(err);
