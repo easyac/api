@@ -33,13 +33,13 @@ paths:
         - Auth
       responses:
         200:
-          description: O Token autenticado
+          description: Aluno Autenticado
           schema:
             $ref: '#/definitions/AlunoToken'
-        default:
-          description: Unexpected Error
-          schema:
-            $ref: '#/definitions/Error'
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
 
   /faltas:
     get:
@@ -69,11 +69,11 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Nota'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+              $ref: '#/definitions/Falta'
+        401:
+          description: Unauthorized
+        404:
+          description: Faltas Not Found
   /notas:
     get:
       security:
@@ -84,13 +84,13 @@ paths:
       parameters:
         - name: ano
           in: query
-          description: Ano da falta.
+          description: Ano da nota.
           required: false
           type: integer
           format: int32
         - name: semestre
           in: query
-          description: Semestre da falta
+          description: Semestre da nota
           required: false
           type: number
           format: int32
@@ -98,15 +98,15 @@ paths:
         - Dados Aluno
       responses:
         200:
-          description: Um array de Faltas
+          description: Um array de Notas
           schema:
             type: array
             items:
-              $ref: '#/definitions/Falta'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+              $ref: '#/definitions/Nota'
+        401:
+          description: Unauthorized
+        404:
+          description: Notas Not Found
 definitions:
   AlunoToken:
     type: object
