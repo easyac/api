@@ -1,0 +1,173 @@
+swagger: '2.0'
+info:
+  title: Easyac API
+  description: Make Requests to Portal do Aluno SenacRS
+  version: "1.0.0"
+
+host: api.easyac.xyz
+
+schemes:
+  - https
+
+securityDefinitions:
+  api_key:
+    type: apiKey
+    in: header
+    name: Bearer
+
+produces:
+  - application/json
+
+paths:
+  /login:
+    post:
+      summary: Autenticação do aluno
+      description: |
+        Autentica o aluno no portal do aluno SENACRS e retorna o token autenticado.
+      parameters:
+        - name: aluno
+          in: body
+          schema:
+            $ref: '#/definitions/Aluno'
+      tags:
+        - Auth
+      responses:
+        200:
+          description: O Token autenticado
+          schema:
+            $ref: '#/definitions/AlunoToken'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /faltas:
+    get:
+      security:
+        - api_key: []
+      summary: Faltas do aluno
+      description: |
+        Retorna todas as faltas do aluno autenticado.
+      parameters:
+        - name: ano
+          in: query
+          description: Ano da falta.
+          required: false
+          type: integer
+          format: int32
+        - name: semestre
+          in: query
+          description: Semestre da falta
+          required: false
+          type: integer
+          format: int32
+      tags:
+        - Dados Aluno
+      responses:
+        200:
+          description: Um array de Faltas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Nota'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /notas:
+    get:
+      security:
+        - api_key: []
+      summary: Notas do aluno
+      description: |
+        Retorna todas as notas do aluno autenticado.
+      parameters:
+        - name: ano
+          in: query
+          description: Ano da falta.
+          required: false
+          type: integer
+          format: int32
+        - name: semestre
+          in: query
+          description: Semestre da falta
+          required: false
+          type: number
+          format: int32
+      tags:
+        - Dados Aluno
+      responses:
+        200:
+          description: Um array de Faltas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Falta'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  AlunoToken:
+    type: object
+    properties:
+      token:
+        type: string
+  Aluno:
+    type: object
+    properties:
+      unidade:
+        type: integer
+      password:
+        type: string
+      username:
+        type: string
+  Falta:
+    type: object
+    properties:
+      cursoId:
+        type: string
+      ano:
+        type: integer
+      semestre:
+        type: integer
+      disciplina:
+        type: string
+      faltas:
+        type: integer
+  Nota:
+    type: object
+    properties:
+      cursoId:
+        type: string
+      ano:
+        type: integer
+      semestre:
+        type: integer
+      disciplina:
+        type: string
+      conceito:
+        type: string
+      parciais:
+        type: array
+        items:
+          $ref: '#/definitions/Parciais'
+  Parciais:
+    type: object
+    properties:
+      descricao:
+        type: string
+      ordemParcial:
+        type: integer
+      valorAvaliacaoParcial:
+        type: string
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
