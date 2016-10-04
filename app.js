@@ -20,13 +20,18 @@ var scrap = require('./routes/scrap');
 
 var app = express();
 
-app.use(cors());
-app.options('*', cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'PUT', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(expressJWT({ secret: Auth.jwtSecret }).unless({ path: ['/login'] }));
+
+app.options('*', cors());
 
 app.use('/', routes);
 app.use('/aluno', aluno);
