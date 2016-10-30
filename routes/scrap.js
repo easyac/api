@@ -1,10 +1,12 @@
 'use strict';
 
 var express = require('express');
-const Easyac = require('easyac-crawler');
+var jwt = require('jsonwebtoken');
+var Auth = require('../config/auth');
 var Aluno = require('../models/aluno');
 var Nota = require('../models/nota');
 var Falta = require('../models/falta');
+const Easyac = require('easyac-crawler');
 var router = express.Router();
 
 const getToken = (req) => {
@@ -16,10 +18,15 @@ const getToken = (req) => {
 
 router.get('/notas', (req, res) => {
   const token = getToken(req);
-  const query = { webToken: token };
+  const payload = jwt.verify(token, Auth.jwtSecret);
+  let query = { _id: payload.id };
+
 
   Aluno.findOne(query, (err, alunoDB) => {
-    if(err || !alunoDB.cookie) throw err;
+    if(err || !alunoDB || !alunoDB.cookie) {
+      res.status(404).send('Aluno not Found');
+      return;
+    }
 
     let AlunoBot = Easyac.aluno(alunoDB.cookie);
 
@@ -44,7 +51,7 @@ router.get('/notas', (req, res) => {
             });
           }
 
-          let nota = new Nota({
+          const notaData = {
             'alunoId': alunoDB._id,
             'cursoId': turma.cursoId,
             'ano': turma.ano,
@@ -52,26 +59,37 @@ router.get('/notas', (req, res) => {
             'disciplina': disc.descricaoDisciplina,
             'conceito': disc.notas.conceito,
             'parciais': parciais
-          });
+          };
+
+          let nota = new Nota(notaData);
 
           nota.save();
         });
       });
 
-      Aluno.update(query, { lastSearch: new Date()}, { multi: true });
+      Aluno.update(query, { lastSearch: new Date() }, { multi: true });
       res.send(data);
     })
-    .catch((err) => console.log(err));
-
+    .catch((err) => {
+      res.status(400).send({
+        msg: err
+      });
+    });
   });
+
+
 });
 
 router.get('/faltas', (req, res) => {
-  let token = getToken(req);
-  let query = {webToken: token};
+  const token = getToken(req);
+  const payload = jwt.verify(token, Auth.jwtSecret);
+  let query = { _id: payload.id };
 
   Aluno.findOne(query, (err, alunoDB) => {
-    if(err || !alunoDB) throw err;
+    if(err || !alunoDB || !alunoDB.cookie) {
+      res.status(404).send('Aluno not Found');
+      return;
+    }
 
     let AlunoBot = Easyac.aluno(alunoDB.cookie);
 
@@ -80,7 +98,7 @@ router.get('/faltas', (req, res) => {
       return AlunoBot.getTurmas();
     })
     .then((data) => {
-      Aluno.update(query, { code: data.codigo});
+      Aluno.update(query, { code: data.codigo });
 
       data.turmas.forEach((turma) => {
         turma.disciplinas.forEach((disc) => {
@@ -98,12 +116,17 @@ router.get('/faltas', (req, res) => {
         });
       });
 
-      Aluno.update(query, { lastSearch: new Date()});
+      Aluno.update(query, { lastSearch: new Date() });
       res.send(data);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      res.status(400).send({
+        msg: err
+      });
+    });
 
   });
+
 });
 
 

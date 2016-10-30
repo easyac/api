@@ -25,8 +25,10 @@ router.post('/login', (req, res) => {
       Aluno.findOne(query, (err, aluno) => {
         if(aluno) {
           let token = jwt.sign({ username: username, id: aluno._id }, Auth.jwtSecret);
-          Aluno.update(query, { cookie: cookie }, {multi: true});
-          res.json({token: token});
+          Aluno.update(query, { cookie: cookie }, {multi: true}, (err, data) =>{
+            console.log(err, data);
+          });
+          res.json({ token: token });
         }
         else{
           aluno = new Aluno({
@@ -36,10 +38,10 @@ router.post('/login', (req, res) => {
             'isValidCookie': true,
             'createdAt': new Date(),
           });
-          aluno.save(err => {
+          aluno.save((err, aluno) => {
+            let token = jwt.sign({ username: username, id: aluno._id }, Auth.jwtSecret);
             if(err) throw err;
             Aluno.update(query, { webToken: token }, {multi: true}, (err, al) => {
-              let token = jwt.sign({ username: username, id: aluno._id }, Auth.jwtSecret);
               console.log(err, al);
               res.json({token: token});
             });
