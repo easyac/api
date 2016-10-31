@@ -35,9 +35,21 @@ router.get('/notas', (req, res) => {
       return AlunoBot.getTurmas();
     })
     .then((data) => {
+      if(!data){
+        res.status(404).send('Data not Found');
+        return;
+      }
+
+      if(!data.turmas){
+        res.status(404).send('Turmas not Found');
+        return
+      }
+
       Aluno.update(query, { code: data.codigo }, { multi: true });
 
       data.turmas.forEach((turma) => {
+        if(!turma.disciplinas) return
+
         turma.disciplinas.forEach((disc) => {
           let parciais = [];
 
@@ -67,17 +79,16 @@ router.get('/notas', (req, res) => {
         });
       });
 
-      Aluno.update(query, { lastSearch: new Date() }, { multi: true });
+      Aluno.update(query, { lastSearch: new Date() }, { multi: true }, (err, r) => console.log(err, r));
       res.send(data);
     })
     .catch((err) => {
+      console.log(err);
       res.status(400).send({
         msg: err
       });
     });
   });
-
-
 });
 
 router.get('/faltas', (req, res) => {
@@ -91,18 +102,29 @@ router.get('/faltas', (req, res) => {
       return;
     }
 
-    let AlunoBot = Easyac.aluno(alunoDB.cookie);
+    const AlunoBot = Easyac.aluno(alunoDB.cookie);
 
     AlunoBot.get()
     .then(() => {
       return AlunoBot.getTurmas();
     })
     .then((data) => {
+      if(!data){
+        res.status(404).send('Data not Found');
+        return;
+      }
+
+      if(!data.turmas){
+        res.status(404).send('Turmas not Found');
+        return
+      }
+
       Aluno.update(query, { code: data.codigo });
 
       data.turmas.forEach((turma) => {
-        turma.disciplinas.forEach((disc) => {
+        if(!turma.disciplinas) return
 
+        turma.disciplinas.forEach((disc) => {
           let falta = new Falta({
             'alunoId': alunoDB._id,
             'cursoId': turma.cursoId,
@@ -112,14 +134,15 @@ router.get('/faltas', (req, res) => {
             'faltas': disc.faltas.total
           });
 
-          falta.save();
+          falta.save((err, r) => console.log(err, r));
         });
       });
 
-      Aluno.update(query, { lastSearch: new Date() });
+      Aluno.update(query, { lastSearch: new Date() }, { multi: true }, (err, r) => console.log(err, r));
       res.send(data);
     })
     .catch((err) => {
+      console.log(err);
       res.status(400).send({
         msg: err
       });
