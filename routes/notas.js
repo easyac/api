@@ -16,7 +16,7 @@ const getToken = (req) => {
 router.get('/', (req, res) => {
   const token = getToken(req);
   const payload = jwt.verify(token, Auth.jwtSecret);
-  const filterFields = {alunoId: 0, _id: 0, __v: 0};
+  const filterFields = {alunoId: 0, _id: 0, __v: 0, 'parciais._id': 0};
   let queryFalta = { alunoId: payload.id };
 
   if(req.query.ano)
