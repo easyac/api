@@ -30,9 +30,21 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-// app.use(expressJWT({ secret: Auth.jwtSecret }).unless({ path: ['/login'] }));
+app.use(expressJWT({ secret: Auth.jwtSecret }).unless({ path: ['/users', '/users/auth'] }));
 
 app.options('*', cors());
+
+app.use(function (req, res, next) {
+  let {authorization} = req.headers;
+  let reg = /Bearer (.*)/ig;
+
+  if(authorization) {
+    let matched = reg.exec(authorization);
+    res.locals.token = matched[1];
+  }
+
+  next();
+});
 
 app.use('/', routes);
 app.use('/users', users);

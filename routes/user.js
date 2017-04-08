@@ -5,13 +5,6 @@ const Auth = require('../config/auth');
 
 const router = express.Router();
 
-const getToken = (req) => {
-  let auth = req.headers.authorization;
-  let reg = /Bearer (.*)/ig;
-  let matched = reg.exec(auth);
-  return matched[1];
-};
-
 const Status = {
   OK: 200,
   Conflict: 409,
@@ -63,11 +56,48 @@ router.post('/auth', (req, res) => {
     let query = {email: user.email, password: user.password};
 
     UserModel.update(query, { webToken }, {multi: true}, (err, data) => {
-      res.send({err, data});
+      if(err){
+        res.sendStatus(Status.InternalServerError);
+        return;
+      }
+
+      res.send({token: webToken});
     });
 
   });
 });
+
+
+router.post('/associate', (req, res) => {
+  let {token} = res.locals;
+
+
+  // if(!email || !password){
+  //   res.sendStatus(Status.BadRequest);
+  //   return;
+  // }
+
+  UserModel.authenticate({email, password}, (valid, user) => {
+    if(!valid){
+      res.sendStatus(Status.NotFound);
+      return;
+    }
+
+    let webToken = jwt.sign({email}, Auth.jwtSecret);
+    let query = {email: user.email, password: user.password};
+
+    UserModel.update(query, { webToken }, {multi: true}, (err, data) => {
+      if(err){
+        res.sendStatus(Status.InternalServerError);
+        return;
+      }
+
+      res.send({token: webToken});
+    });
+
+  });
+});
+
 
 router.post('/revalidade', (req, res) => {
   res.send(Status.OK);
