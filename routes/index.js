@@ -25,7 +25,7 @@ router.post('/login', (req, res) => {
       Aluno.findOne(query, (err, aluno) => {
         if(aluno) {
           let token = jwt.sign({ username: username, id: aluno._id }, Auth.jwtSecret);
-          Aluno.update(query, { cookie: cookie }, {multi: true}, (err, data) =>{
+          Aluno.update(query, { cookie: cookie }, {multi: true}, (err, data) => {
             console.log(err, data);
           });
           res.json({ token: token });

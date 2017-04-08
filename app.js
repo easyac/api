@@ -13,10 +13,11 @@ const Auth = require('./config/auth');
 mongoose.connect(configDB.url);
 
 var routes = require('./routes/index');
+var users = require('./routes/user');
 var aluno = require('./routes/aluno');
 var faltas = require('./routes/faltas');
 var notas = require('./routes/notas');
-var scrap = require('./routes/scrap');
+// var scrap = require('./routes/scrap');
 
 var app = express();
 
@@ -29,17 +30,17 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(expressJWT({ secret: Auth.jwtSecret }).unless({ path: ['/login'] }));
+// app.use(expressJWT({ secret: Auth.jwtSecret }).unless({ path: ['/login'] }));
 
 app.options('*', cors());
 
 app.use('/', routes);
+app.use('/users', users);
 app.use('/aluno', aluno);
 app.use('/faltas', faltas);
 app.use('/notas', notas);
-app.use('/scrap', scrap);
+// app.use('/scrap', scrap);
 
-// catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
@@ -57,6 +58,5 @@ app.use(function(err, req, res) {
   res.status(err.status || 500);
   res.send(err.message);
 });
-
 
 module.exports = app;
