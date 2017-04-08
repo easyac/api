@@ -70,7 +70,7 @@ router.post('/auth', (req, res) => {
 });
 
 router.post('/revalidade', (req, res) => {
-
+  res.send(Status.OK);
 })
 
 module.exports = router;
