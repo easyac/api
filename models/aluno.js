@@ -6,13 +6,6 @@ const schema = {
   'unity': Number, // campus
   'password': String,
   'cookie': String,
-  'webToken': String,
-  'deviceTokens': [
-    {
-      'type': String,
-      'value': String
-    }
-  ],
   'isValidCookie': Boolean,
   'createdAt': Date,
   'lastSearch': Date
