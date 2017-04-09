@@ -10,6 +10,7 @@ const Status = {
   Conflict: 409,
   BadRequest: 400,
   NotFound: 404,
+  UnprocessableEntity: 422,
   InternalServerError: 500,
 }
 
@@ -67,35 +68,42 @@ router.post('/auth', (req, res) => {
   });
 });
 
-
-router.post('/associate', (req, res) => {
+router.put('/associate', (req, res) => {
   let {token} = res.locals;
+  let {username, password, unity, storePassword} = req.body;
 
+  if(!username || !unity){
+    res.send(Status.UnprocessableEntity);
+    return;
+  }
 
-  // if(!email || !password){
-  //   res.sendStatus(Status.BadRequest);
-  //   return;
-  // }
-
-  UserModel.authenticate({email, password}, (valid, user) => {
-    if(!valid){
+  UserModel.findOne({webToken:token}, (err, user) => {
+    if(err || !user){
       res.sendStatus(Status.NotFound);
       return;
     }
 
-    let webToken = jwt.sign({email}, Auth.jwtSecret);
-    let query = {email: user.email, password: user.password};
-
-    UserModel.update(query, { webToken }, {multi: true}, (err, data) => {
-      if(err){
-        res.sendStatus(Status.InternalServerError);
-        return;
+    let query = {_id: user._id};
+    let updatedUser = Object.assign({
+      senacCredentials: {
+        username,
+        unity,
+        password,
+        storePassword
       }
+    }, user._doc);
 
-      res.send({token: webToken});
-    });
-
+    UserModel.update(query, updatedUser, (err, data) => {
+      if(err) res.sendStatus(Status.InternalServerError);
+      else res.sendStatus(Status.OK);
+    })
   });
+
+});
+
+router.delete('/associate', (req, res) => {
+  let {token} = res.locals;
+  res.send(Status.OK)
 });
 
 
