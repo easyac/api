@@ -5,18 +5,12 @@ const Auth = require('../config/auth');
 
 const router = express.Router();
 
-const getToken = (req) => {
-  let auth = req.headers.authorization;
-  let reg = /Bearer (.*)/ig;
-  let matched = reg.exec(auth);
-  return matched[1];
-};
-
 const Status = {
   OK: 200,
   Conflict: 409,
   BadRequest: 400,
   NotFound: 404,
+  UnprocessableEntity: 422,
   InternalServerError: 500,
 }
 
@@ -63,11 +57,55 @@ router.post('/auth', (req, res) => {
     let query = {email: user.email, password: user.password};
 
     UserModel.update(query, { webToken }, {multi: true}, (err, data) => {
-      res.send({err, data});
+      if(err){
+        res.sendStatus(Status.InternalServerError);
+        return;
+      }
+
+      res.send({token: webToken});
     });
 
   });
 });
+
+router.put('/associate', (req, res) => {
+  let {token} = res.locals;
+  let {username, password, unity, storePassword} = req.body;
+
+  if(!username || !unity){
+    res.send(Status.UnprocessableEntity);
+    return;
+  }
+
+  UserModel.findOne({webToken:token}, (err, user) => {
+    if(err || !user){
+      res.sendStatus(Status.NotFound);
+      return;
+    }
+
+    let query = {_id: user._id};
+    let updatedUser = Object.assign({
+      senacCredentials: {
+        username,
+        unity,
+        password,
+        storePassword
+      }
+    }, user._doc);
+
+    UserModel.update(query, updatedUser, (err, data) => {
+      if(err) res.sendStatus(Status.InternalServerError);
+      else res.sendStatus(Status.OK);
+    })
+  });
+
+});
+
+router.delete('/associate', (req, res) => {
+  let {token} = res.locals;
+  res.send(Status.OK)
+});
+
 
 router.post('/revalidade', (req, res) => {
   res.send(Status.OK);

@@ -8,10 +8,14 @@ const schema = {
   'password': String,
   'alunoId': String,
   'webToken': String,
-  'settings' : {
-    'saveSenacPassword': { type: Boolean, default: false }
+  'senacCredentials' : {
+    'username': String,
+    'unity': Number,
+    'password': String,
+    'storePassword': Boolean
   }
 };
+
 const userSchema = mongoose.Schema(schema);
 
 /**
@@ -45,6 +49,5 @@ userSchema.statics.authenticate = function(user, cb){
 
   });
 };
-
 
 module.exports = mongoose.model('User', userSchema);
