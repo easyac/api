@@ -12,7 +12,10 @@ const schema = {
     'username': String,
     'unity': Number,
     'password': String,
-    'storePassword': Boolean
+    'storePassword': Boolean,
+    'cookie': {type: String, default: ''},
+    'lastSync': Date,
+    'isSyncing': {type: Boolean, default: false}
   }
 };
 
@@ -38,6 +41,11 @@ userSchema.pre('save', function(next) {
 userSchema.statics.exists = function(email, cb){
   return this.find({ email }, cb);
 };
+
+userSchema.statics.isSyncing = function(webToken, cb){
+  return this.findOne({ webToken }, cb);
+};
+
 
 userSchema.statics.authenticate = function(user, cb){
   let {email, password} = user;

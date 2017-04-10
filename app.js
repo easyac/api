@@ -8,13 +8,16 @@ var bodyParser = require('body-parser');
 var expressJWT = require('express-jwt');
 var jwt = require('jsonwebtoken');
 var mongoose = require('mongoose');
-const configDB = require('./config/database');
-const Auth = require('./config/auth');
 
-mongoose.connect(configDB.url);
+const Config = require('./config');
+mongoose.connect(Config.database.url);
+
+const NRP = require('./config/nrp');
 
 var routes = require('./routes/index');
 var users = require('./routes/user');
+var senac = require('./routes/senac');
+require('./routes/worker');
 
 var app = express();
 
@@ -27,10 +30,9 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(expressJWT({ secret: Auth.jwtSecret }).unless({ path: ['/users', '/users/auth'] }));
+app.use(expressJWT({ secret: Config.auth.jwtSecret }).unless({ path: ['/users', '/users/auth'] }));
 
 app.options('*', cors());
-
 app.use(function (req, res, next) {
   let {authorization} = req.headers;
   let reg = /Bearer (.*)/ig;
@@ -38,15 +40,15 @@ app.use(function (req, res, next) {
   if(authorization) {
     let matched = reg.exec(authorization);
     let token = matched[1];
-    jwt.verify(token, Auth.jwtSecret);
+    const data = jwt.verify(token, Config.auth.jwtSecret);
     res.locals.token = token;
   }
 
   next();
 });
-
 app.use('/', routes);
 app.use('/users', users);
+app.use('/senac', senac);
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

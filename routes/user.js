@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const UserModel = require('../models/user');
-const Auth = require('../config/auth');
+const Auth = require('../config').auth;
 
 const router = express.Router();
 
@@ -84,14 +84,14 @@ router.put('/associate', (req, res) => {
     }
 
     let query = {_id: user._id};
-    let updatedUser = Object.assign({
+    let updatedUser = Object.assign(user._doc, {
       senacCredentials: {
         username,
         unity,
         password,
         storePassword
       }
-    }, user._doc);
+    });
 
     UserModel.update(query, updatedUser, (err, data) => {
       if(err) res.sendStatus(Status.InternalServerError);
