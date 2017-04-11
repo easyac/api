@@ -13,3 +13,7 @@ NRP.on('api:save-cookie', data => {
     console.log(err, d);
   })
 });
+
+NRP.on('api:save-classes', data => {
+  console.log(data);
+});
