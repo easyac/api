@@ -2,23 +2,15 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const UserModel = require('../models/user');
 const Auth = require('../config').auth;
+const HttpStatus = require('http-status-codes');
 
 const router = express.Router();
-
-const Status = {
-  OK: 200,
-  Conflict: 409,
-  BadRequest: 400,
-  NotFound: 404,
-  UnprocessableEntity: 422,
-  InternalServerError: 500,
-}
 
 router.post('/', (req, res) => {
   const {password, email} = req.body;
 
   if(!email || !password){
-    res.sendStatus(Status.BadRequest);
+    res.sendStatus(HttpStatus.BAD_REQUEST);
     return;
   }
 
@@ -28,13 +20,13 @@ router.post('/', (req, res) => {
       let user = new UserModel({ email, password });
       user.save((err) => {
         if(err){
-          res.sendStatus(Status.InternalServerError);
+          res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }else{
-          res.sendStatus(Status.OK);
+          res.sendStatus(HttpStatus.OK);
         }
       });
     }else{
-      res.sendStatus(Status.Conflict);
+      res.sendStatus(HttpStatus.CONFLICT);
     }
   });
 });
@@ -43,13 +35,13 @@ router.post('/auth', (req, res) => {
   const {password, email} = req.body;
 
   if(!email || !password){
-    res.sendStatus(Status.BadRequest);
+    res.sendStatus(HttpStatus.BAD_REQUEST);
     return;
   }
 
   UserModel.authenticate({email, password}, (valid, user) => {
     if(!valid){
-      res.sendStatus(Status.NotFound);
+      res.sendStatus(HttpStatus.NOT_FOUND);
       return;
     }
 
@@ -58,7 +50,7 @@ router.post('/auth', (req, res) => {
 
     UserModel.update(query, { webToken }, {multi: true}, (err, data) => {
       if(err){
-        res.sendStatus(Status.InternalServerError);
+        res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         return;
       }
 
@@ -73,13 +65,13 @@ router.put('/associate', (req, res) => {
   let {username, password, unity, storePassword} = req.body;
 
   if(!username || !unity){
-    res.send(Status.UnprocessableEntity);
+    res.send(HttpStatus.UnprocessableEntity);
     return;
   }
 
   UserModel.findOne({webToken:token}, (err, user) => {
     if(err || !user){
-      res.sendStatus(Status.NotFound);
+      res.sendStatus(HttpStatus.NOT_FOUND);
       return;
     }
 
@@ -93,9 +85,9 @@ router.put('/associate', (req, res) => {
       }
     });
 
-    UserModel.update(query, updatedUser, (err, data) => {
-      if(err) res.sendStatus(Status.InternalServerError);
-      else res.sendStatus(Status.OK);
+    UserModel.update(query, updatedUser, err => {
+      if(err) res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+      else res.sendStatus(HttpStatus.OK);
     })
   });
 
@@ -103,12 +95,12 @@ router.put('/associate', (req, res) => {
 
 router.delete('/associate', (req, res) => {
   let {token} = res.locals;
-  res.send(Status.OK)
+  res.send(HttpStatus.OK)
 });
 
 
 router.post('/revalidade', (req, res) => {
-  res.send(Status.OK);
+  res.send(HttpStatus.OK);
 })
 
 module.exports = router;
