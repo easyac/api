@@ -12,8 +12,6 @@ var mongoose = require('mongoose');
 const Config = require('./config');
 mongoose.connect(Config.database.url);
 
-const NRP = require('./config/nrp');
-
 var routes = require('./routes/index');
 var users = require('./routes/user');
 var senac = require('./routes/senac');
@@ -40,7 +38,7 @@ app.use(function (req, res, next) {
   if(authorization) {
     let matched = reg.exec(authorization);
     let token = matched[1];
-    const data = jwt.verify(token, Config.auth.jwtSecret);
+    jwt.verify(token, Config.auth.jwtSecret);
     res.locals.token = token;
   }
 
