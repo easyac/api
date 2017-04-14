@@ -1,21 +1,19 @@
-'use strict';
-
 const mongoose = require('mongoose');
 
 const schema = {
-  'alunoId': String,
-  'cursoId': Number,
-  'disciplina': String,
-  'ano': Number,
-  'semestre': Number,
-  'conceito': String,
-  'parciais': [
+  alunoId: String,
+  cursoId: Number,
+  disciplina: String,
+  ano: Number,
+  semestre: Number,
+  conceito: String,
+  parciais: [
     {
-      'descricao': String,
-      'ordemParcial': Number,
-      'valorAvaliacaoParcial': String,
-    }
-  ]
+      descricao: String,
+      ordemParcial: Number,
+      valorAvaliacaoParcial: String,
+    },
+  ],
 };
 
 const notaSchema = mongoose.Schema(schema);

@@ -1,7 +1,7 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_doc", "_id"] }] */
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const HttpStatus = require('http-status-code');
+const HttpStatus = require('http-status-codes');
 const UserModel = require('../models/user');
 const Auth = require('../config').auth;
 

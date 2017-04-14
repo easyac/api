@@ -1,14 +1,13 @@
-'use strict';
 const mongoose = require('mongoose');
 
 const schema = {
-  'username': String,
-  'unity': Number, // campus
-  'password': String,
-  'cookie': String,
-  'isValidCookie': Boolean,
-  'createdAt': Date,
-  'lastSearch': Date
+  username: String,
+  unity: Number, // campus
+  password: String,
+  cookie: String,
+  isValidCookie: Boolean,
+  createdAt: Date,
+  lastSearch: Date,
 };
 
 

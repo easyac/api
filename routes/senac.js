@@ -1,5 +1,7 @@
+/* eslint no-underscore-dangle: ["error", { "allow": ["_doc", "_id"] }] */
+const debug = require('debug')('easyacapi');
 const express = require('express');
-const HttpStatus = require('http-status-code');
+const HttpStatus = require('http-status-codes');
 const NRP = require('../config/nrp');
 const UserModel = require('../models/user');
 
@@ -26,9 +28,26 @@ router.post('/sync', (req, res) => {
 
     const { isSyncing, username, cookie } = user.senacCredentials;
     if (!isSyncing) {
+      const query = { _id: user._id };
       NRP.emit('worker:sync', { cookie, username });
-      res.sendStatus(HttpStatus.OK);
+      UserModel.update(query, { 'senacCredentials.isSyncing': true }, debug);
     }
+
+    res.send({ status: 'pending' });
+  });
+});
+
+
+router.post('/sync/status', (req, res) => {
+  UserModel.isSyncing(res.locals.token, (err, user) => {
+    if (err || !user) {
+      res.send(HttpStatus.BAD_REQUEST);
+      return;
+    }
+
+    const { isSyncing } = user.senacCredentials;
+    const status = isSyncing ? 'pending' : 'complete';
+    res.send({ status });
   });
 });
 

@@ -1,4 +1,5 @@
 const express = require('express');
+const debug = require('debug')('easyacapi');
 const cors = require('cors');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
@@ -7,6 +8,8 @@ const expressJWT = require('express-jwt');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const Config = require('./config');
+
+debug('Starting Easyac API');
 
 mongoose.connect(Config.database.url);
 

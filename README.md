@@ -1,3 +1,4 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/easyac/api/badge)](https://www.codefactor.io/repository/github/easyac/api)
 
 Docker run
 

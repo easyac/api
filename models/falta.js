@@ -1,13 +1,12 @@
-'use strict';
 const mongoose = require('mongoose');
 
 const schema = {
-  'alunoId': String,
-  'cursoId': Number,
-  'disciplina': String,
-  'ano': Number,
-  'semestre': Number,
-  'faltas': Number
+  alunoId: String,
+  cursoId: Number,
+  disciplina: String,
+  ano: Number,
+  semestre: Number,
+  faltas: Number,
 };
 
 const faltaSchema = mongoose.Schema(schema);
