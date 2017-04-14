@@ -8,6 +8,20 @@ const UserModel = require('../../models/user');
 const ClassModel = require('../../models/class');
 const NRP = require('../../config/nrp');
 
+function updateSyncStatus(userId) {
+  const query = { _id: userId };
+  const update = {
+    $currentDate: {
+      lastModified: true,
+      'senacCredentials.lastSync': { $type: 'date' },
+    },
+    $set: {
+      'senacCredentials.isSyncing': false,
+    },
+  };
+  UserModel.update(query, update, debug);
+}
+
 NRP.on('api:save-cookie', (data) => {
   const query = { 'senacCredentials.username': data.username };
   const update = {
@@ -21,6 +35,7 @@ NRP.on('api:save-cookie', (data) => {
     else debug(`Saved cookie for ${data.username}`);
   });
 });
+
 
 NRP.on('api:save-classes', (res) => {
   const { username, data } = res;
@@ -85,5 +100,6 @@ NRP.on('api:save-classes', (res) => {
         }
       });
     });
+    updateSyncStatus(user._id);
   });
 });

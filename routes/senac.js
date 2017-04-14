@@ -30,10 +30,13 @@ router.post('/sync', (req, res) => {
     if (!isSyncing) {
       const query = { _id: user._id };
       NRP.emit('worker:sync', { cookie, username });
-      UserModel.update(query, { 'senacCredentials.isSyncing': true }, debug);
+      UserModel.update(query, { 'senacCredentials.isSyncing': true }, (updateErr, data) => {
+        debug(updateErr, data);
+        res.send({ status: 'pending' });
+      });
+    } else {
+      res.send({ status: 'pending' });
     }
-
-    res.send({ status: 'pending' });
   });
 });
 
