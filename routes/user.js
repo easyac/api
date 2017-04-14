@@ -1,114 +1,102 @@
+/* eslint no-underscore-dangle: ["error", { "allow": ["_doc", "_id"] }] */
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const HttpStatus = require('http-status-codes');
 const UserModel = require('../models/user');
-const Auth = require('../config/auth');
+const Auth = require('../config').auth;
 
 const router = express.Router();
 
-const Status = {
-  OK: 200,
-  Conflict: 409,
-  BadRequest: 400,
-  NotFound: 404,
-  UnprocessableEntity: 422,
-  InternalServerError: 500,
-}
-
 router.post('/', (req, res) => {
-  const {password, email} = req.body;
+  const { password, email } = req.body;
 
-  if(!email || !password){
-    res.sendStatus(Status.BadRequest);
+  if (!email || !password) {
+    res.sendStatus(HttpStatus.BAD_REQUEST);
     return;
   }
 
   UserModel.exists(email, (err, exists) => {
-    if(exists.length === 0){
-      // password =
-      let user = new UserModel({ email, password });
-      user.save((err) => {
-        if(err){
-          res.sendStatus(Status.InternalServerError);
-        }else{
-          res.sendStatus(Status.OK);
+    if (exists.length === 0) {
+      const user = new UserModel({ email, password });
+      user.save((saveErr) => {
+        if (saveErr) {
+          res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+          res.sendStatus(HttpStatus.OK);
         }
       });
-    }else{
-      res.sendStatus(Status.Conflict);
+    } else {
+      res.sendStatus(HttpStatus.CONFLICT);
     }
   });
 });
 
 router.post('/auth', (req, res) => {
-  const {password, email} = req.body;
+  const { password, email } = req.body;
 
-  if(!email || !password){
-    res.sendStatus(Status.BadRequest);
+  if (!email || !password) {
+    res.sendStatus(HttpStatus.BAD_REQUEST);
     return;
   }
 
-  UserModel.authenticate({email, password}, (valid, user) => {
-    if(!valid){
-      res.sendStatus(Status.NotFound);
+  UserModel.authenticate({ email, password }, (valid, user) => {
+    if (!valid) {
+      res.sendStatus(HttpStatus.NOT_FOUND);
       return;
     }
 
-    let webToken = jwt.sign({email}, Auth.jwtSecret);
-    let query = {email: user.email, password: user.password};
+    const webToken = jwt.sign({ email }, Auth.jwtSecret);
+    const query = { email: user.email, password: user.password };
 
-    UserModel.update(query, { webToken }, {multi: true}, (err, data) => {
-      if(err){
-        res.sendStatus(Status.InternalServerError);
+    UserModel.update(query, { webToken }, { multi: true }, (err) => {
+      if (err) {
+        res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         return;
       }
 
-      res.send({token: webToken});
+      res.send({ token: webToken });
     });
-
   });
 });
 
 router.put('/associate', (req, res) => {
-  let {token} = res.locals;
-  let {username, password, unity, storePassword} = req.body;
+  const { token } = res.locals;
+  const { username, password, unity, storePassword } = req.body;
 
-  if(!username || !unity){
-    res.send(Status.UnprocessableEntity);
+  if (!username || !unity) {
+    res.send(HttpStatus.UnprocessableEntity);
     return;
   }
 
-  UserModel.findOne({webToken:token}, (err, user) => {
-    if(err || !user){
-      res.sendStatus(Status.NotFound);
+  UserModel.findOne({ webToken: token }, (err, user) => {
+    if (err || !user) {
+      res.sendStatus(HttpStatus.NOT_FOUND);
       return;
     }
-
-    let query = {_id: user._id};
-    let updatedUser = Object.assign({
+    const query = { _id: user._id };
+    const updatedUser = Object.assign(user._doc, {
       senacCredentials: {
         username,
         unity,
         password,
-        storePassword
-      }
-    }, user._doc);
+        storePassword,
+      },
+    });
 
-    UserModel.update(query, updatedUser, (err, data) => {
-      if(err) res.sendStatus(Status.InternalServerError);
-      else res.sendStatus(Status.OK);
-    })
+    UserModel.update(query, updatedUser, (updateErr) => {
+      if (updateErr) res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+      else res.sendStatus(HttpStatus.OK);
+    });
   });
-
 });
 
 router.delete('/associate', (req, res) => {
-  let {token} = res.locals;
-  res.send(Status.OK)
+  res.send(HttpStatus.OK);
 });
 
 
 router.post('/revalidade', (req, res) => {
-  res.send(Status.OK);
-})
+  res.send(HttpStatus.OK);
+});
 
 module.exports = router;
