@@ -8,7 +8,7 @@ ENV TZ America/Sao_Paulo
 ADD . /app
 WORKDIR /app
 
-RUN npm install
+RUN npm install --production --silent
 
 EXPOSE 3000
 
