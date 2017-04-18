@@ -33,7 +33,7 @@ const schema = {
           subParciais: { type: Array, default: [] },
         },
       ],
-      defaults: [],
+      default: [],
     },
   },
 };
