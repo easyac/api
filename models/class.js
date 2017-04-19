@@ -42,4 +42,25 @@ const classSchema = mongoose.Schema(schema);
 
 classSchema.index({ userId: 1, ano: 1, semester: 1 });
 
+classSchema.statics.get = function get(query, cb) {
+  const fields = {
+    __v: 0,
+    userId: 0,
+    codigo: 0,
+    codigoEnturmacao: 0,
+    cursoId: 0,
+    codigoDisciplina: 0,
+    'notas.parciais.pesoParcial': 0,
+    'notas.parciais.divulgaNotas': 0,
+    'notas.parciais.codigoAvaliacaoParcial': 0,
+    'notas.parciais.disciplina': 0,
+    'notas.parciais._id': 0,
+    'notas.parciais.subParciais': 0,
+    'notas.parciais.legendaDispensaParcial': 0,
+    'notas.parciais.descricaoDispensaParcial': 0,
+  };
+
+  return this.find(query, fields, cb);
+};
+
 module.exports = mongoose.model('Class', classSchema);

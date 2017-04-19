@@ -17,9 +17,10 @@ Start project with Makefile task `make docker-run`.
 |VERB|ROUTE|DESCRIPTION|
 |---|---|---|
 |`POST`|**/user**| Create User |
+|`GET`|**/user**| Get User data |
 |`POST`|**/user/auth**| Authenticate User |
 |`POST`|**/user/revalidate**| Revalidate User Auth |
-|`POST`|**/senac/associate**| Associate Senac Login with user |
+|`PUT`|**/senac/associate**| Associate Senac Login with user |
 |`POST`|**/senac/login**| Login in Senac Portal |
 |`POST`|**/senac/sync**| Ask EasyacBOT for sync Senac data |
 |`POST`|**/senac/sync/status**| Look at status sync |

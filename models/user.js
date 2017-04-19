@@ -45,6 +45,18 @@ userSchema.statics.findByUsername = function findByUsername(username, cb) {
   return this.findOne({ 'senacCredentials.username': username }, cb);
 };
 
+
+userSchema.statics.get = function get(webToken, cb) {
+  const fields = {
+    _id: 0,
+    password: 0,
+    'senacCredentials.password': 0,
+    'senacCredentials.cookie': 0,
+    __v: 0,
+  };
+  return this.findOne({ webToken }, fields, cb);
+};
+
 userSchema.statics.isSyncing = function isSyncing(webToken, cb) {
   return this.findOne({ webToken }, cb);
 };

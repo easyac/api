@@ -13,6 +13,7 @@ debug('Starting Easyac API');
 
 mongoose.connect(Config.database.url);
 
+const student = require('./routes/student');
 const users = require('./routes/user');
 const senac = require('./routes/senac');
 require('./routes/worker');
@@ -21,14 +22,14 @@ const app = express();
 
 app.use(cors({
   origin: '*',
-  methods: ['GET', 'PUT', 'POST'],
+  methods: ['GET', 'PUT', 'POST', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(expressJWT({ secret: Config.auth.jwtSecret }).unless({ path: ['/users', '/users/auth'] }));
+app.use(expressJWT({ secret: Config.auth.jwtSecret }).unless({ path: ['/user', '/user/auth'] }));
 
 app.options('*', cors());
 app.use((req, res, next) => {
@@ -45,6 +46,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/', student);
 app.use('/user', users);
 app.use('/senac', senac);
 
