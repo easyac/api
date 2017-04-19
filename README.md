@@ -1,10 +1,16 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/easyac/api/badge)](https://www.codefactor.io/repository/github/easyac/api)
 
-## Start
+## Run
 
-Clone and run [easyac/worker](https://github.com/easyac/workers). It is a dependency.
+#### Development
 
-So start this project with Makefile task `make docker-run`.
+Clone and run [easyac/worker](https://github.com/easyac/workers). It is a dependency. So run this project Makefile task `make run`.
+
+
+#### Docker
+
+Start project with Makefile task `make docker-run`.
+
 
 ## Routes
 
