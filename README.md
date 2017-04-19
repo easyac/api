@@ -1,13 +1,26 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/easyac/api/badge)](https://www.codefactor.io/repository/github/easyac/api)
 
-Docker run
+## Run
 
-```shell
-docker run -p 3000:3000 --link mongo:mongo --env MONGO_URL=mongodb://mongo/easyac easyac/api
-```
+#### Development
 
-Start withou docker
-```shell
-DEBUG=* NODE_ENV=dev PORT=3000 MONGO_URL=mongodb://localhost/easyac JWT_SECRET="[YteUqD8?HAG{PCkLjYwms3ura[@aJy,@9)wt=x" nodemon ./bin/www
+Clone and run [easyac/worker](https://github.com/easyac/workers). It is a dependency. So run this project Makefile task `make run`.
 
-```
+
+#### Docker
+
+Start project with Makefile task `make docker-run`.
+
+
+## Routes
+
+|VERB|ROUTE|DESCRIPTION|
+|---|---|---|
+|`POST`|**/user**| Create User |
+|`POST`|**/user/auth**| Authenticate User |
+|`POST`|**/user/revalidate**| Revalidate User Auth |
+|`POST`|**/senac/associate**| Associate Senac Login with user |
+|`POST`|**/senac/login**| Login in Senac Portal |
+|`POST`|**/senac/sync**| Ask EasyacBOT for sync Senac data |
+|`POST`|**/senac/sync/status**| Look at status sync |
+|`GET`|**/class**| Retrieve student classes |

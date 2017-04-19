@@ -6,7 +6,7 @@
     "start": "DEBUG=easyacapi ./node_modules/nodemon/bin/nodemon.js ./bin/www"
   },
   "dependencies": {
-    "bcrypt": "^1.0.2",
+    "bcrypt": "1.0.2",
     "body-parser": "~1.15.1",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.1",
