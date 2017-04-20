@@ -3,7 +3,6 @@
 */
 const debug = require('debug')('easyacapi');
 const deepEqual = require('deep-equal');
-// const diff = require('deep-diff');
 const UserModel = require('../../models/user');
 const ClassModel = require('../../models/class');
 const NRP = require('../../config/nrp');
@@ -35,7 +34,6 @@ NRP.on('api:save-cookie', (data) => {
     else debug(`Saved cookie for ${data.username}`);
   });
 });
-
 
 NRP.on('api:save-classes', (res) => {
   const { username, data } = res;

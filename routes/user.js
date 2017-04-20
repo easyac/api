@@ -31,6 +31,16 @@ router.post('/', (req, res) => {
   });
 });
 
+router.get('/', (req, res) => {
+  UserModel.get(res.locals.token, (err, user) => {
+    if (err) {
+      res.sendStatus(HttpStatus.NOT_FOUND);
+    }
+    res.send(user.toObject());
+  });
+});
+
+
 router.post('/auth', (req, res) => {
   const { password, email } = req.body;
 
@@ -59,41 +69,9 @@ router.post('/auth', (req, res) => {
   });
 });
 
-router.put('/associate', (req, res) => {
-  const { token } = res.locals;
-  const { username, password, unity, storePassword } = req.body;
-
-  if (!username || !unity) {
-    res.send(HttpStatus.UnprocessableEntity);
-    return;
-  }
-
-  UserModel.findOne({ webToken: token }, (err, user) => {
-    if (err || !user) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-      return;
-    }
-    const query = { _id: user._id };
-    const updatedUser = Object.assign(user._doc, {
-      senacCredentials: {
-        username,
-        unity,
-        password,
-        storePassword,
-      },
-    });
-
-    UserModel.update(query, updatedUser, (updateErr) => {
-      if (updateErr) res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-      else res.sendStatus(HttpStatus.OK);
-    });
-  });
-});
-
 router.delete('/associate', (req, res) => {
   res.send(HttpStatus.OK);
 });
-
 
 router.post('/revalidade', (req, res) => {
   res.send(HttpStatus.OK);
