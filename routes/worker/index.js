@@ -46,8 +46,9 @@ NRP.on('api:save-classes', (res) => {
     // Normalize Classes
     data.turmas.forEach((turma) => {
       const { codigo, codigoEnturmacao, cursoId, ano, semestre, periodo, descricao } = turma;
+      const turmaDisciplinas = turma.disciplinas || [];
 
-      turma.disciplinas.forEach((d) => {
+      turmaDisciplinas.forEach((d) => {
         const disciplina = {
           codigo,
           codigoEnturmacao,
