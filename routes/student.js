@@ -7,6 +7,17 @@ const User = require('../models/user');
 
 const router = express.Router();
 
+router.get('/', (req, res) => {
+  res.send({
+    docs: 'https://docs.easyac.xyz/',
+    version: '0.1.0',
+  });
+});
+
+router.get('/healthcheck', (req, res) => {
+  res.send({ alive: true });
+});
+
 router.get('/classes', (req, res) => {
   const { ano, semestre } = req.query;
   User.findOne({ webToken: res.locals.token }, (err, user) => {

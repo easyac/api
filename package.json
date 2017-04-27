@@ -1,6 +1,6 @@
 {
   "name": "easyac-api",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "DEBUG=easyacapi ./node_modules/nodemon/bin/nodemon.js ./bin/www"
