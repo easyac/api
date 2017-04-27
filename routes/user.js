@@ -55,17 +55,21 @@ router.post('/auth', (req, res) => {
       return;
     }
 
-    const webToken = jwt.sign({ email }, Auth.jwtSecret);
-    const query = { email: user.email, password: user.password };
+    if (user.webToken) {
+      res.send({ token: user.webToken });
+    } else {
+      const webToken = jwt.sign({ email }, Auth.jwtSecret);
+      const query = { email: user.email, password: user.password };
 
-    UserModel.update(query, { webToken }, { multi: true }, (err) => {
-      if (err) {
-        res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        return;
-      }
+      UserModel.update(query, { webToken }, { multi: true }, (err) => {
+        if (err) {
+          res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+          return;
+        }
 
-      res.send({ token: webToken });
-    });
+        res.send({ token: webToken });
+      });
+    }
   });
 });
 

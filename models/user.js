@@ -65,7 +65,11 @@ userSchema.statics.isSyncing = function isSyncing(webToken, cb) {
 userSchema.statics.authenticate = function authenticate(user, cb) {
   const { email, password } = user;
   this.findOne({ email }, (err, foundUser) => {
-    if (err || !foundUser) cb(false, {});
+    if (err || !foundUser) {
+      cb(false, {});
+      return;
+    }
+
     bcrypt
       .compare(password, foundUser.password)
       .then(res => cb(res, foundUser));
