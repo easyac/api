@@ -13,10 +13,12 @@ const schema = {
   descricaoDisciplina: String,
   descricaoReduzidaDisciplina: String,
   faltas: {
-    total: { type: String, default: '0' },
+    total: { type: Number, default: 0 },
+    aps: { type: Number, default: 0 },
   },
   notas: {
     conceito: { type: String, default: 'S/N' },
+    resultado: { type: String, default: '-' },
     parciais: {
       type: [
         {
