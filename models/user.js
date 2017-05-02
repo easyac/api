@@ -7,6 +7,10 @@ const schema = {
   email: String,
   password: String,
   webToken: String,
+  devices: {
+    android: String,
+    ios: String,
+  },
   senacCredentials: {
     username: String,
     unity: Number,
@@ -50,6 +54,7 @@ userSchema.statics.get = function get(webToken, cb) {
   const fields = {
     _id: 0,
     password: 0,
+    devices: 0,
     'senacCredentials.password': 0,
     'senacCredentials.cookie': 0,
     __v: 0,

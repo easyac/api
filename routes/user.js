@@ -40,7 +40,6 @@ router.get('/', (req, res) => {
   });
 });
 
-
 router.post('/auth', (req, res) => {
   const { password, email } = req.body;
 
