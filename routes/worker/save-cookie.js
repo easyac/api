@@ -16,7 +16,7 @@ module.exports = (job, done) => {
     else debug(`Saved cookie for ${data.username}`);
     if (user.devices.android || user.devices.ios) {
       queue
-        .create('worker:notify-sync', { devices: user.devices, status: 'success' })
+        .create('worker:notify-login', { devices: user.devices, status: 'success' })
         .ttl(1000 * 60 * 24)
         .priority('high')
         .save(debug);
