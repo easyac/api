@@ -2,9 +2,10 @@
 const debug = require('debug')('easyacapi');
 const express = require('express');
 const HttpStatus = require('http-status-codes');
-const NRP = require('../config/nrp');
+const queue = require('../config/queue');
 const UserModel = require('../models/user');
 
+const SIX_HOURS = 1000 * 60 * 6;
 const router = express.Router();
 
 router.put('/associate', (req, res) => {
@@ -46,7 +47,14 @@ router.post('/login', (req, res) => {
     return;
   }
 
-  NRP.emit('worker:login', { username, password, unity });
+  queue.create('worker:login', { username, password, unity })
+    .ttl(SIX_HOURS)
+    .priority('high')
+    .save((err) => {
+      if (err) debug(err);
+      debug('JOB %s for %s sent', 'worker:login', username);
+    });
+
   res.sendStatus(HttpStatus.OK);
 });
 
@@ -59,7 +67,15 @@ router.post('/sync', (req, res) => {
 
     const { username, cookie } = user.senacCredentials;
     const query = { _id: user._id };
-    NRP.emit('worker:sync', { cookie, username });
+
+    queue.create('worker:sync', { cookie, username })
+      .ttl(SIX_HOURS)
+      .priority('high')
+      .save((jobErr) => {
+        if (jobErr) debug(jobErr);
+        debug('JOB %s for %s sent', 'worker:sync', username);
+      });
+
     UserModel.update(query, { 'senacCredentials.isSyncing': true }, (updateErr, data) => {
       debug(updateErr, data);
       res.send({ status: 'pending' });
