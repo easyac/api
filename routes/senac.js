@@ -96,5 +96,4 @@ router.post('/sync/status', (req, res) => {
   });
 });
 
-
 module.exports = router;

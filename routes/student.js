@@ -14,6 +14,18 @@ router.get('/', (req, res) => {
   });
 });
 
+router.post('/device/register', (req, res) => {
+  const { platform, token } = req.body;
+  const query = { webToken: res.locals.token };
+  const update = { devices: {} };
+  update.devices[platform] = token;
+
+  User.findOneAndUpdate(query, update, (err) => {
+    debug(err);
+    res.send(HttpStatus.OK);
+  });
+});
+
 router.get('/healthcheck', (req, res) => {
   res.send({ alive: true });
 });
