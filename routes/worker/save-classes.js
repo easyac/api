@@ -8,10 +8,40 @@ const debug = require('debug')('easyacapi');
 const deepEqual = require('deep-equal');
 const UserModel = require('../../models/user');
 const ClassModel = require('../../models/class');
-// const queue = require('../../config/queue');
+const queue = require('../../config/queue');
 
 module.exports = (job, done) => {
   const { username, data } = job.data;
+
+  function notifyUserAbsenses(user, newerData) {
+    if (user.devices.android || user.devices.ios) {
+      queue
+        .create('worker:notify-absense', { devices: user.devices, class: newerData })
+        .ttl(1000 * 60 * 24)
+        .priority('high')
+        .save(debug);
+    }
+  }
+
+  function notifyUserGrades(user, newerData) {
+    if (user.devices.android || user.devices.ios) {
+      queue
+        .create('worker:notify-grade', { devices: user.devices, class: newerData })
+        .ttl(1000 * 60 * 24)
+        .priority('high')
+        .save(debug);
+    }
+  }
+
+  function notifyUserSync(user) {
+    if (user.devices.android || user.devices.ios) {
+      queue
+        .create('worker:notify-sync', { devices: user.devices, status: 'success' })
+        .ttl(1000 * 60 * 24)
+        .priority('high')
+        .save(debug);
+    }
+  }
 
   function updateSyncStatus(userId) {
     const query = { _id: userId };
@@ -132,10 +162,12 @@ module.exports = (job, done) => {
         } else {
           verifyAbsenses(classData, newerData, () => {
             updateAbsenses(query, newerData);
+            notifyUserAbsenses(user, newerData);
           });
 
           verifyGrades(classData, newerData, () => {
             updateGrades(query, newerData);
+            notifyUserGrades(user, newerData);
           });
           done();
         }
@@ -144,5 +176,6 @@ module.exports = (job, done) => {
     });
 
     updateSyncStatus(user._id);
+    notifyUserSync(user);
   });
 };
