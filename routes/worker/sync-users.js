@@ -25,7 +25,7 @@ module.exports = (job, done) => {
     if (err) debug(err);
     else {
       debug('Found %s user(s) to sync', users.length);
-      users.map(enqueueJob);
+      // users.map(enqueueJob);
     }
     done();
   });
